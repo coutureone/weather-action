@@ -32,18 +32,18 @@ jobs:
             echo 'FILE_TEXT<<EOF' >> $GITHUB_ENV
             cat ./result.txt >> $GITHUB_ENV
             echo 'EOF' >> $GITHUB_ENV
-#       - name: 'Send mail'
-#         uses: dawidd6/action-send-mail@master
-#         with:
-#           server_address: smtp.163.com
-#           server_port: 465
-#           username: ${{ secrets.MAIL_USER_NMAE }}
-#           password: ${{ secrets.MAIL_PWD }}
-#           subject: 今日新闻简报推送 (${{env.REPORT_DATE}})
-#           body: file://result.txt
-#           to: 864562082@qq.com
-#           from: GitHub Actions
-#           content_type: text/html
+       - name: 'Send mail'
+         uses: dawidd6/action-send-mail@master
+         with:
+           server_address: smtp.163.com
+           server_port: 465
+           username: ${{ secrets.MAIL_USER_NMAE }}
+           password: ${{ secrets.MAIL_PWD }}
+           subject: 今日新闻简报推送 (${{env.REPORT_DATE}})
+           body: file://result.txt
+           to: coutureone@163.com
+           from: GitHub Actions
+           content_type: text/html
 
           
      # - name: '发送到钉钉群'
@@ -55,16 +55,16 @@ jobs:
      #   content: |
      #    ${{env.FILE_TEXT}} 
 
-      - name: Telegram通知
-        run: |
-          curl "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-          -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-          -d "text=${{env.FILE_TEXT}}"
-                     
+#      - name: Telegram通知
+#        run: |
+#          curl "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+#          -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+#          -d "text=${{env.FILE_TEXT}}"
+
       - name: '打完收工,提交代码!'
         run: |
-          git config --local user.email "864562082@qq.com"
-          git config --local user.name "WangGuibin"
+          git config --local user.email "couturecome@gamil.com"
+          git config --local user.name "coutureone"
           git remote set-url origin https://${{ github.actor }}:${{ secrets.MYGG_TOKEN }}@github.com/${{ github.repository }}
           git pull
           currentDate=${{env.TODAY_DATE}}
