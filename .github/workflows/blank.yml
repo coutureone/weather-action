@@ -46,14 +46,18 @@ jobs:
            content_type: text/html
 
 
+# ...前面的步骤保持不变...
+
       - name: '发送到钉钉群'
         uses: fifsky/dingtalk-action@master
-        with:
-        url: ${{ secrets.DINGTALK_WEBHOOK}}
+        with:  # 注意这里需要缩进
+        url: ${{ secrets.DINGTALK_WEBHOOK }}  # 缩进2格
         type: text
         at: all
         content: |
          ${{env.FILE_TEXT}} 
+
+# ...后续步骤保持不变...
 
 #      - name: Telegram通知
 #        run: |
