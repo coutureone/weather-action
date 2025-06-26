@@ -1,69 +1,72 @@
 on:
   push:
   schedule:
-    - cron: "38 22 * * *" #早上6点45左右推送
-    
+    - cron: "38 22 * * *" # 早上6点45左右推送
+
 jobs:
   bot:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout codes'
         uses: actions/checkout@v2
+
       - name: python env
         uses: actions/setup-python@v1
         with:
           python-version: 3.9.23
-      # 安装依赖
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install setuptools wheel twine
           pip install bs4
+
       - name: 'Get DataSource'
         run: curl https://news.topurl.cn > ./result.html
+
       - name: 'Get Info'
         run: python ./getInfo.py
+
       - name: 'Get Date'
         run: |
           echo "REPORT_DATE=$(TZ=':Asia/Shanghai' date '+%Y-%m-%d %T')" >> $GITHUB_ENV
           echo "TODAY_DATE=$(TZ=':Asia/Shanghai' date +'%Y-%m-%d')" >> $GITHUB_ENV
+
       - name: 'Get TEXT'
         run: |
             echo 'FILE_TEXT<<EOF' >> $GITHUB_ENV
             cat ./result.txt >> $GITHUB_ENV
             echo 'EOF' >> $GITHUB_ENV
+
       - name: 'Send mail'
         uses: dawidd6/action-send-mail@master
         with:
-           server_address: smtp.163.com
-           server_port: 465
-           username: ${{ secrets.MAIL_USER_NMAE }}
-           password: ${{ secrets.MAIL_PWD }}
-           subject: 今日新闻简报推送 (${{env.REPORT_DATE}})
-           body: file://result.txt
-           to: coutureone@163.com
-           from: GitHub Actions
-           content_type: text/html
+          server_address: smtp.163.com
+          server_port: 465
+          username: ${{ secrets.MAIL_USER_NMAE }}
+          password: ${{ secrets.MAIL_PWD }}
+          subject: 今日新闻简报推送 (${{env.REPORT_DATE}})
+          body: file://result.txt
+          to: coutureone@163.com
+          from: GitHub Actions
+          content_type: text/html
 
-
-# ...前面的步骤保持不变...
-
+      # 修复钉钉通知的缩进
       - name: '发送到钉钉群'
         uses: fifsky/dingtalk-action@master
-        with:  # 注意这里需要缩进
-        url: ${{ secrets.DINGTALK_WEBHOOK }}  # 缩进2格
-        type: text
-        at: all
-        content: |
-         ${{env.FILE_TEXT}} 
+        with:
+          url: ${{ secrets.DINGTALK_WEBHOOK }}  # 确保secret名称正确
+          type: text
+          at: all
+          content: |
+            ${{env.FILE_TEXT}}
 
-# ...后续步骤保持不变...
-
-#      - name: Telegram通知
-#        run: |
-#          curl "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-#          -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-#          -d "text=${{env.FILE_TEXT}}"
+      # Telegram通知（可选）
+      # - name: Telegram通知
+      #   run: |
+      #     curl "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+      #     -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+      #     -d "text=${{env.FILE_TEXT}}"
 
       - name: '打完收工,提交代码!'
         run: |
