@@ -52,11 +52,15 @@ jobs:
           content_type: text/html
 
       # 修复钉钉通知的缩进
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
       - name: '发送到钉钉群'
         uses: fifsky/dingtalk-action@master
         with:
-          url: ${{ secrets.DINGTALK_WEBHOOK }}
-          secret: ${{ secrets.DINGTALK_SECRET }} # 确保secret名称正确
+          url: ${{ secrets.DINGTALK_WEBHOOK }}?sign=${{ secrets.DINGTALK_SECRET }}
           type: text
           at: all
           content: |
