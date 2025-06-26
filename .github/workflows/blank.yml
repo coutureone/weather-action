@@ -51,20 +51,50 @@ jobs:
           from: GitHub Actions
           content_type: text/html
 
-      # 修复钉钉通知的缩进
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: '发送到钉钉群'
-        uses: fifsky/dingtalk-action@master
-        with:
-          url: ${{ secrets.DINGTALK_WEBHOOK }}?sign=${{ secrets.DINGTALK_SECRET }}
-          type: text
-          at: all
-          content: |
-            ${{env.FILE_TEXT}}
+      - name: '发送到钉钉群 (使用curl)'
+        env:
+          DINGTALK_WEBHOOK: ${{ secrets.DINGTALK_WEBHOOK }}   # 基础URL，不包含签名参数
+          DINGTALK_SECRET: ${{ secrets.DINGTALK_SECRET }}     # 加签密钥
+        run: |
+          # 安装必要的工具（如果系统没有的话）
+          sudo apt-get update -y
+          sudo apt-get install -y openssl coreutils
+          
+          # 获取当前时间戳（毫秒）
+          timestamp=$(date +%s%3N)
+          
+          # 计算签名
+          string_to_sign="${timestamp}\n${DINGTALK_SECRET}"
+          sign=$(echo -ne "$string_to_sign" | openssl dgst -sha256 -hmac "$DINGTALK_SECRET" -binary | base64 | tr -d '\n')
+          
+          # URL编码签名
+          sign=$(echo $sign | sed 's/+/%2B/g; s/\//%2F/g; s/=/%3D/g')
+          
+          # 构造完整URL
+          url="${DINGTALK_WEBHOOK}&timestamp=${timestamp}&sign=${sign}"
+          
+          # 构建JSON消息体
+          # 注意：需要转义双引号和特殊字符
+          content=$(echo "${{env.FILE_TEXT}}" | sed 's/"/\\"/g' | sed "s/'/\\\\'/g")
+          
+          # 创建JSON数据
+          json_data="{
+            \"msgtype\": \"text\",
+            \"text\": {
+              \"content\": \"$content\"
+            },
+            \"at\": {
+              \"isAtAll\": true
+            }
+          }"
+          
+          # 发送请求
+          echo "发送钉钉消息..."
+          curl -v -s "$url" \
+               -H "Content-Type: application/json" \
+               -d "$json_data"
+          
+          echo "钉钉消息发送完成！"
 
       # Telegram通知（可选）
       # - name: Telegram通知
