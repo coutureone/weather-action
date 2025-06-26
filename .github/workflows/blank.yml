@@ -55,7 +55,8 @@ jobs:
       - name: '发送到钉钉群'
         uses: fifsky/dingtalk-action@master
         with:
-          url: ${{ secrets.DINGTALK_WEBHOOK }}  # 确保secret名称正确
+          url: ${{ secrets.DINGTALK_WEBHOOK }}
+          secret: ${{ secrets.DINGTALK_SECRET }} # 确保secret名称正确
           type: text
           at: all
           content: |
