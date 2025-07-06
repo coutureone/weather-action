@@ -1,3 +1,4 @@
+# 修正后的 blank.yml 文件
 on:
   push:
   schedule:
@@ -34,9 +35,9 @@ jobs:
 
       - name: 'Get TEXT'
         run: |
-            echo 'FILE_TEXT<<EOF' >> $GITHUB_ENV
-            cat ./result.txt >> $GITHUB_ENV
-            echo 'EOF' >> $GITHUB_ENV
+          echo 'FILE_TEXT<<EOF' >> $GITHUB_ENV
+          cat ./result.txt >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
 
       - name: 'Send mail'
         uses: dawidd6/action-send-mail@master
@@ -51,50 +52,61 @@ jobs:
           from: GitHub Actions
           content_type: text/html
 
-      - name: '发送到钉钉群 (使用curl)'
+      - name: '发送到钉钉群 (多个机器人)'
         env:
-          DINGTALK_WEBHOOK: ${{ secrets.DINGTALK_WEBHOOK }}   # 基础URL，不包含签名参数
-          DINGTALK_SECRET: ${{ secrets.DINGTALK_SECRET }}     # 加签密钥
+          DINGTALK_WEBHOOK_1: ${{ secrets.DINGTALK_WEBHOOK }}    # 第一个机器人
+          DINGTALK_SECRET_1: ${{ secrets.DINGTALK_SECRET }}      # 第一个机器人的密钥
+          DINGTALK_WEBHOOK_2: ${{ secrets.DINGTALK_WEBHOOK_2 }} # 第二个机器人
+          DINGTALK_SECRET_2: ${{ secrets.DINGTALK_SECRET_2 }}    # 第二个机器人的密钥
         run: |
-          # 安装必要的工具（如果系统没有的话）
+          # 安装必要工具
           sudo apt-get update -y
           sudo apt-get install -y openssl coreutils
           
-          # 获取当前时间戳（毫秒）
-          timestamp=$(date +%s%3N)
+          # 定义发送函数
+          send_to_dingtalk() {
+            local webhook=$1
+            local secret=$2
+            
+            # 获取当前时间戳（毫秒）
+            timestamp=$(date +%s%3N)
+            
+            # 计算签名
+            string_to_sign="${timestamp}\n${secret}"
+            sign=$(echo -ne "$string_to_sign" | openssl dgst -sha256 -hmac "$secret" -binary | base64 | tr -d '\n')
+            
+            # URL编码签名
+            sign=$(echo $sign | sed 's/+/%2B/g; s/\//%2F/g; s/=/%3D/g')
+            
+            # 构造完整URL
+            url="${webhook}&timestamp=${timestamp}&sign=${sign}"
+            
+            # 构建JSON消息体
+            content=$(echo "$FILE_TEXT" | sed 's/"/\\"/g' | sed "s/'/\\\\'/g")
+            
+            json_data="{
+              \"msgtype\": \"text\",
+              \"text\": {
+                \"content\": \"$content\"
+              },
+              \"at\": {
+                \"isAtAll\": true
+              }
+            }"
+            
+            # 发送请求 - 修复了这里的问题
+            echo "发送钉钉消息到机器人 $webhook..."
+            curl -s -o /dev/null -w "HTTP状态码: %{http_code}\n" "$url" \
+                 -H "Content-Type: application/json" \
+                 -d "$json_data"
+            echo "钉钉消息发送完成！"
+          }
           
-          # 计算签名
-          string_to_sign="${timestamp}\n${DINGTALK_SECRET}"
-          sign=$(echo -ne "$string_to_sign" | openssl dgst -sha256 -hmac "$DINGTALK_SECRET" -binary | base64 | tr -d '\n')
+          # 发送给第一个机器人
+          send_to_dingtalk "$DINGTALK_WEBHOOK_1" "$DINGTALK_SECRET_1"
           
-          # URL编码签名
-          sign=$(echo $sign | sed 's/+/%2B/g; s/\//%2F/g; s/=/%3D/g')
-          
-          # 构造完整URL
-          url="${DINGTALK_WEBHOOK}&timestamp=${timestamp}&sign=${sign}"
-          
-          # 构建JSON消息体
-          # 注意：需要转义双引号和特殊字符
-          content=$(echo "${{env.FILE_TEXT}}" | sed 's/"/\\"/g' | sed "s/'/\\\\'/g")
-          
-          # 创建JSON数据
-          json_data="{
-            \"msgtype\": \"text\",
-            \"text\": {
-              \"content\": \"$content\"
-            },
-            \"at\": {
-              \"isAtAll\": true
-            }
-          }"
-          
-          # 发送请求
-          echo "发送钉钉消息..."
-          curl -v -s "$url" \
-               -H "Content-Type: application/json" \
-               -d "$json_data"
-          
-          echo "钉钉消息发送完成！"
+          # 发送给第二个机器人
+          send_to_dingtalk "$DINGTALK_WEBHOOK_2" "$DINGTALK_SECRET_2"
 
       # Telegram通知（可选）
       # - name: Telegram通知
