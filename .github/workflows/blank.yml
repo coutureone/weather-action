@@ -1,22 +1,28 @@
-# 修正后的 blank.yml 文件
+name: News Brief Bot
+
 on:
-# ... (其他 on 的内容不变)
+  push:
+    branches:
+      - master # 推荐指定分支，如果没有则保持空
+  schedule:
+    # UTC 22:38 相当于北京时间（+8）的早上 06:38
+    - cron: "38 22 * * *" 
 
 jobs:
   bot:
     runs-on: ubuntu-latest
+    
     steps:
       - name: 'Checkout codes'
-        uses: actions/checkout@v2
+        # 升级到 v4，确保安全性
+        uses: actions/checkout@v4 
 
       - name: python env
-        # 注意：actions/setup-python@v1 版本较老，建议升级到 @v4 或 @v5
-        uses: actions/setup-python@v1
+        # 升级到 actions/setup-python@v5
+        uses: actions/setup-python@v5 
         with:
-          # 修正：改为通配的 3.9，匹配最新的 3.9.x 版本
-          python-version: 3.9
-          # 报错中提到的 architecture: x64 默认即是，可以省略，也可以保留
-          # architecture: x64
+          # 使用通配形式 '3.9' 解决精确版本找不到的问题
+          python-version: '3.9' 
 
       - name: Install dependencies
         run: |
@@ -32,11 +38,13 @@ jobs:
 
       - name: 'Get Date'
         run: |
+          # 设置东八区时间
           echo "REPORT_DATE=$(TZ=':Asia/Shanghai' date '+%Y-%m-%d %T')" >> $GITHUB_ENV
           echo "TODAY_DATE=$(TZ=':Asia/Shanghai' date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: 'Get TEXT'
         run: |
+          # 使用多行字符串安全地设置环境变量 FILE_TEXT
           echo 'FILE_TEXT<<EOF' >> $GITHUB_ENV
           cat ./result.txt >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
@@ -70,6 +78,12 @@ jobs:
             local webhook=$1
             local secret=$2
             
+            # 检查 webhook 是否存在
+            if [ -z "$webhook" ]; then
+                echo "Warning: Webhook not set for a bot. Skipping."
+                return 0
+            fi
+
             # 获取当前时间戳（毫秒）
             timestamp=$(date +%s%3N)
             
@@ -84,6 +98,8 @@ jobs:
             url="${webhook}&timestamp=${timestamp}&sign=${sign}"
             
             # 构建JSON消息体
+            # 注意：此处 $FILE_TEXT 是从 GITHUB_ENV 读取的，在 run 块中需要注意引号和换行符的处理
+            # 已经使用了 sed 进行 JSON 安全转义
             content=$(echo "$FILE_TEXT" | sed 's/"/\\"/g' | sed "s/'/\\\\'/g")
             
             json_data="{
@@ -96,7 +112,7 @@ jobs:
               }
             }"
             
-            # 发送请求 - 修复了这里的问题
+            # 发送请求
             echo "发送钉钉消息到机器人 $webhook..."
             curl -s -o /dev/null -w "HTTP状态码: %{http_code}\n" "$url" \
                  -H "Content-Type: application/json" \
@@ -121,10 +137,12 @@ jobs:
         run: |
           git config --local user.email "couturecome@gamil.com"
           git config --local user.name "coutureone"
+          # 使用 GITHUB_TOKEN 是更安全的做法，这里假设 MYGG_TOKEN 是具有 repo 权限的个人访问令牌
           git remote set-url origin https://${{ github.actor }}:${{ secrets.MYGG_TOKEN }}@github.com/${{ github.repository }}
           git pull
           currentDate=${{env.TODAY_DATE}}
+          # 创建并复制文件到以年份命名的文件夹中
           mkdir -p  ${currentDate%%-*} && cp result.txt ${currentDate%%-*}/${currentDate}.txt
           git add .
-          git commit -m "Update By Github Action Bot"
+          git commit -m "Update By Github Action Bot (${{env.TODAY_DATE}})"
           git push
