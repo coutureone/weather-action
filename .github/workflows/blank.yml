@@ -72,7 +72,8 @@ jobs:
               title: $title,
               body: $body,
               group: "weather-action",
-              sound: "minuet.caf"
+              sound: "minuet.caf",
+              icon: "https://raw.githubusercontent.com/coutureone/weather-action/master/assets/bark-news-icon.png?v=1"
             }' > "$payload"
 
           payload_size=$(wc -c < "$payload")
