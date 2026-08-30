@@ -1,12 +1,10 @@
 name: News Brief Bot
 
 on:
-  push:
-    branches:
-      - master # 推荐指定分支，如果没有则保持空
   schedule:
-    # UTC 22:38 相当于北京时间（+8）的早上 06:38
-    - cron: "38 22 * * *" 
+    # UTC 23:00 相当于北京时间（+8）的早上 07:00
+    - cron: "0 23 * * *"
+  workflow_dispatch:
 
 jobs:
   bot:
@@ -42,13 +40,6 @@ jobs:
           echo "REPORT_DATE=$(TZ=':Asia/Shanghai' date '+%Y-%m-%d %T')" >> $GITHUB_ENV
           echo "TODAY_DATE=$(TZ=':Asia/Shanghai' date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-      - name: 'Get TEXT'
-        run: |
-          # 使用多行字符串安全地设置环境变量 FILE_TEXT
-          echo 'FILE_TEXT<<EOF' >> $GITHUB_ENV
-          cat ./result.txt >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
-
 #      - name: 'Send mail'
 #        uses: dawidd6/action-send-mail@master
 #        with:
@@ -62,69 +53,43 @@ jobs:
 #          from: GitHub Actions
 #          content_type: text/html
 
-      - name: '发送到钉钉群 (多个机器人)'
+      - name: '发送 Bark 全文通知'
         env:
-          DINGTALK_WEBHOOK_1: ${{ secrets.DINGTALK_WEBHOOK }}    # 第一个机器人
-          DINGTALK_SECRET_1: ${{ secrets.DINGTALK_SECRET }}      # 第一个机器人的密钥
-          DINGTALK_WEBHOOK_2: ${{ secrets.DINGTALK_WEBHOOK_2 }} # 第二个机器人
-          DINGTALK_SECRET_2: ${{ secrets.DINGTALK_SECRET_2 }}    # 第二个机器人的密钥
+          BARK_DEVICE_KEY: ${{ secrets.BARK_DEVICE_KEY }}
         run: |
-          # 安装必要工具
-          sudo apt-get update -y
-          sudo apt-get install -y openssl coreutils
-          
-          # 定义发送函数
-          send_to_dingtalk() {
-            local webhook=$1
-            local secret=$2
-            
-            # 检查 webhook 是否存在
-            if [ -z "$webhook" ]; then
-                echo "Warning: Webhook not set for a bot. Skipping."
-                return 0
-            fi
+          if [ -z "$BARK_DEVICE_KEY" ]; then
+            echo "BARK_DEVICE_KEY 未配置"
+            exit 1
+          fi
 
-            # 获取当前时间戳（毫秒）
-            timestamp=$(date +%s%3N)
-            
-            # 计算签名
-            string_to_sign="${timestamp}\n${secret}"
-            sign=$(echo -ne "$string_to_sign" | openssl dgst -sha256 -hmac "$secret" -binary | base64 | tr -d '\n')
-            
-            # URL编码签名
-            sign=$(echo $sign | sed 's/+/%2B/g; s/\//%2F/g; s/=/%3D/g')
-            
-            # 构造完整URL
-            url="${webhook}&timestamp=${timestamp}&sign=${sign}"
-            
-            # 构建JSON消息体
-            # 注意：此处 $FILE_TEXT 是从 GITHUB_ENV 读取的，在 run 块中需要注意引号和换行符的处理
-            # 已经使用了 sed 进行 JSON 安全转义
-            content=$(echo "$FILE_TEXT" | sed 's/"/\\"/g' | sed "s/'/\\\\'/g")
-            
-            json_data="{
-              \"msgtype\": \"text\",
-              \"text\": {
-                \"content\": \"$content\"
-              },
-              \"at\": {
-                \"isAtAll\": false
-              }
-            }"
-            
-            # 发送请求
-            echo "发送钉钉消息到机器人 $webhook..."
-            curl -s -o /dev/null -w "HTTP状态码: %{http_code}\n" "$url" \
-                 -H "Content-Type: application/json" \
-                 -d "$json_data"
-            echo "钉钉消息发送完成！"
-          }
-          
-          # 发送给第一个机器人
-          send_to_dingtalk "$DINGTALK_WEBHOOK_1" "$DINGTALK_SECRET_1"
-          
-          # 发送给第二个机器人
-          send_to_dingtalk "$DINGTALK_WEBHOOK_2" "$DINGTALK_SECRET_2"
+          payload="$RUNNER_TEMP/bark-payload.json"
+          jq -n \
+            --arg device_key "$BARK_DEVICE_KEY" \
+            --arg title "今日新闻简报 ($TODAY_DATE)" \
+            --rawfile body ./result.txt \
+            '{
+              device_key: $device_key,
+              title: $title,
+              body: $body,
+              group: "weather-action",
+              sound: "minuet.caf"
+            }' > "$payload"
+
+          payload_size=$(wc -c < "$payload")
+          if [ "$payload_size" -gt 4000 ]; then
+            echo "Bark 请求体 ${payload_size} 字节，超过安全限制，为避免全文被截断已停止发送"
+            exit 1
+          fi
+
+          response=$(curl --fail-with-body --silent --show-error \
+            --connect-timeout 10 \
+            --retry 2 \
+            -X POST 'https://api.day.app/push' \
+            -H 'Content-Type: application/json; charset=utf-8' \
+            --data-binary "@$payload")
+
+          echo "$response" | jq -e '.code == 200' > /dev/null
+          echo "Bark 全文通知发送成功"
 
       # Telegram通知（可选）
       # - name: Telegram通知
