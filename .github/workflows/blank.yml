@@ -73,7 +73,7 @@ jobs:
               body: $body,
               group: "weather-action",
               sound: "minuet.caf",
-              icon: "https://raw.githubusercontent.com/coutureone/weather-action/master/assets/bark-news-icon.png?v=3"
+              icon: "https://raw.githubusercontent.com/coutureone/weather-action/master/assets/bark-news-icon.png"
             }' > "$payload"
 
           payload_size=$(wc -c < "$payload")

@@ -12,9 +12,9 @@
     </radialGradient>
   </defs>
 
-  <!-- Full-bleed artwork: Bark applies the circular mask, avoiding a white antialiased rim. -->
-  <rect width="512" height="512" fill="url(#background)"/>
-  <rect width="512" height="512" fill="url(#light)"/>
+  <!-- Match wxread: the rounded background touches every canvas edge. -->
+  <rect width="512" height="512" rx="116" fill="url(#background)"/>
+  <rect width="512" height="512" rx="116" fill="url(#light)"/>
 
   <!-- Flat single-page news glyph, optimized for notification-size rendering. -->
   <rect x="126" y="96" width="260" height="320" rx="34" stroke="white" stroke-width="28"/>
