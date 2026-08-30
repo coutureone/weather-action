@@ -1,33 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
   <defs>
-    <linearGradient id="background" x1="82" y1="60" x2="430" y2="456" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#38BDF8"/>
-      <stop offset="0.48" stop-color="#2563EB"/>
-      <stop offset="1" stop-color="#4338CA"/>
+    <linearGradient id="background" x1="54" y1="52" x2="458" y2="460" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1677FF"/>
+      <stop offset="0.56" stop-color="#139DEB"/>
+      <stop offset="1" stop-color="#20C7D4"/>
     </linearGradient>
-    <radialGradient id="light" cx="0" cy="0" r="1" gradientTransform="translate(150 116) rotate(48) scale(330)" gradientUnits="userSpaceOnUse">
-      <stop stop-color="white" stop-opacity="0.34"/>
-      <stop offset="0.72" stop-color="white" stop-opacity="0"/>
+    <radialGradient id="light" cx="0" cy="0" r="1" gradientTransform="translate(142 116) rotate(45) scale(330)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="white" stop-opacity="0.22"/>
+      <stop offset="0.75" stop-color="white" stop-opacity="0"/>
     </radialGradient>
   </defs>
 
-  <!-- Bark displays custom icons with a circular mask, so the artwork is circular by design. -->
-  <circle cx="256" cy="256" r="252" fill="url(#background)"/>
-  <circle cx="256" cy="256" r="252" fill="url(#light)"/>
-  <circle cx="256" cy="256" r="242" stroke="white" stroke-opacity="0.18" stroke-width="4"/>
+  <!-- Full-bleed artwork: Bark applies the circular mask, avoiding a white antialiased rim. -->
+  <rect width="512" height="512" fill="url(#background)"/>
+  <rect width="512" height="512" fill="url(#light)"/>
 
-  <!-- A subtle offset copy gives the white glyph depth without adding a second container. -->
-  <g transform="translate(82 82) scale(14)" stroke="#17398F" stroke-opacity="0.30" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M16 6H19A1 1 0 0 1 20 7V18A2 2 0 0 1 16 18V5A1 1 0 0 0 15 4H5A1 1 0 0 0 4 5V17A3 3 0 0 0 7 20H18"/>
-    <path d="M8 8H12"/>
-    <path d="M8 12H12"/>
-    <path d="M8 16H12"/>
-  </g>
-  <g transform="translate(82 72) scale(14)" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M16 6H19A1 1 0 0 1 20 7V18A2 2 0 0 1 16 18V5A1 1 0 0 0 15 4H5A1 1 0 0 0 4 5V17A3 3 0 0 0 7 20H18"/>
-    <path d="M8 8H12"/>
-    <path d="M8 12H12"/>
-    <path d="M8 16H12"/>
-  </g>
+  <!-- Flat single-page news glyph, optimized for notification-size rendering. -->
+  <rect x="126" y="96" width="260" height="320" rx="34" stroke="white" stroke-width="28"/>
+  <rect x="170" y="146" width="76" height="72" rx="12" fill="white"/>
+  <path d="M278 164H340" stroke="white" stroke-width="24" stroke-linecap="round"/>
+  <path d="M278 204H340" stroke="white" stroke-width="24" stroke-linecap="round"/>
+  <path d="M170 270H340" stroke="white" stroke-width="24" stroke-linecap="round"/>
+  <path d="M170 320H340" stroke="white" stroke-width="24" stroke-linecap="round"/>
+  <path d="M170 370H286" stroke="white" stroke-width="24" stroke-linecap="round"/>
 </svg>
