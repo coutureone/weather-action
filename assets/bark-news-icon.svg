@@ -1,29 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
   <defs>
-    <linearGradient id="background" x1="64" y1="48" x2="448" y2="464" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#1597FF"/>
-      <stop offset="0.52" stop-color="#3564EE"/>
-      <stop offset="1" stop-color="#7338CC"/>
+    <linearGradient id="background" x1="82" y1="60" x2="430" y2="456" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/>
+      <stop offset="0.48" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#4338CA"/>
     </linearGradient>
-    <radialGradient id="highlight" cx="0" cy="0" r="1" gradientTransform="translate(146 116) rotate(45) scale(344)" gradientUnits="userSpaceOnUse">
+    <radialGradient id="light" cx="0" cy="0" r="1" gradientTransform="translate(150 116) rotate(48) scale(330)" gradientUnits="userSpaceOnUse">
       <stop stop-color="white" stop-opacity="0.34"/>
-      <stop offset="0.65" stop-color="white" stop-opacity="0"/>
+      <stop offset="0.72" stop-color="white" stop-opacity="0"/>
     </radialGradient>
   </defs>
 
-  <rect x="16" y="16" width="480" height="480" rx="116" fill="url(#background)"/>
-  <rect x="16" y="16" width="480" height="480" rx="116" fill="url(#highlight)"/>
-  <path d="M86 154C86 115.34 117.34 84 156 84H356C394.66 84 426 115.34 426 154V358C426 396.66 394.66 428 356 428H156C117.34 428 86 396.66 86 358V154Z" fill="white" fill-opacity="0.12"/>
-  <path d="M106 154C106 126.386 128.386 104 156 104H356C383.614 104 406 126.386 406 154" stroke="white" stroke-opacity="0.18" stroke-width="3" stroke-linecap="round"/>
+  <!-- Bark displays custom icons with a circular mask, so the artwork is circular by design. -->
+  <circle cx="256" cy="256" r="252" fill="url(#background)"/>
+  <circle cx="256" cy="256" r="252" fill="url(#light)"/>
+  <circle cx="256" cy="256" r="242" stroke="white" stroke-opacity="0.18" stroke-width="4"/>
 
-  <g transform="translate(88 96) scale(14)" stroke="#183A97" stroke-opacity="0.26" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+  <!-- A subtle offset copy gives the white glyph depth without adding a second container. -->
+  <g transform="translate(82 82) scale(14)" stroke="#17398F" stroke-opacity="0.30" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round">
     <path d="M16 6H19A1 1 0 0 1 20 7V18A2 2 0 0 1 16 18V5A1 1 0 0 0 15 4H5A1 1 0 0 0 4 5V17A3 3 0 0 0 7 20H18"/>
     <path d="M8 8H12"/>
     <path d="M8 12H12"/>
     <path d="M8 16H12"/>
   </g>
-  <g transform="translate(88 88) scale(14)" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <g transform="translate(82 72) scale(14)" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
     <path d="M16 6H19A1 1 0 0 1 20 7V18A2 2 0 0 1 16 18V5A1 1 0 0 0 15 4H5A1 1 0 0 0 4 5V17A3 3 0 0 0 7 20H18"/>
     <path d="M8 8H12"/>
     <path d="M8 12H12"/>
