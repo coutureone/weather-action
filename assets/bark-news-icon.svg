@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
   <defs>
-    <linearGradient id="background" x1="54" y1="52" x2="458" y2="460" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#1677FF"/>
-      <stop offset="0.56" stop-color="#139DEB"/>
-      <stop offset="1" stop-color="#20C7D4"/>
+    <linearGradient id="background" x1="42" y1="36" x2="468" y2="480" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#172BFF"/>
+      <stop offset="0.42" stop-color="#1E7BFF"/>
+      <stop offset="1" stop-color="#16C8C5"/>
     </linearGradient>
-    <radialGradient id="light" cx="0" cy="0" r="1" gradientTransform="translate(142 116) rotate(45) scale(330)" gradientUnits="userSpaceOnUse">
-      <stop stop-color="white" stop-opacity="0.22"/>
-      <stop offset="0.75" stop-color="white" stop-opacity="0"/>
+    <radialGradient id="glassGlow" cx="0" cy="0" r="1" gradientTransform="translate(144 104) rotate(42) scale(354)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="white" stop-opacity="0.36"/>
+      <stop offset="0.7" stop-color="white" stop-opacity="0"/>
     </radialGradient>
+    <linearGradient id="paper" x1="164" y1="112" x2="346" y2="402" gradientUnits="userSpaceOnUse">
+      <stop stop-color="white" stop-opacity="0.98"/>
+      <stop offset="1" stop-color="#E3F5FF" stop-opacity="0.90"/>
+    </linearGradient>
   </defs>
-
-  <!-- Match wxread: the rounded background touches every canvas edge. -->
   <rect width="512" height="512" rx="116" fill="url(#background)"/>
-  <rect width="512" height="512" rx="116" fill="url(#light)"/>
-
-  <!-- Flat single-page news glyph, optimized for notification-size rendering. -->
-  <rect x="126" y="96" width="260" height="320" rx="34" stroke="white" stroke-width="28"/>
-  <rect x="170" y="146" width="76" height="72" rx="12" fill="white"/>
-  <path d="M278 164H340" stroke="white" stroke-width="24" stroke-linecap="round"/>
-  <path d="M278 204H340" stroke="white" stroke-width="24" stroke-linecap="round"/>
-  <path d="M170 270H340" stroke="white" stroke-width="24" stroke-linecap="round"/>
-  <path d="M170 320H340" stroke="white" stroke-width="24" stroke-linecap="round"/>
-  <path d="M170 370H286" stroke="white" stroke-width="24" stroke-linecap="round"/>
+  <rect width="512" height="512" rx="116" fill="url(#glassGlow)"/>
+  <ellipse cx="176" cy="72" rx="220" ry="92" fill="white" fill-opacity="0.08" transform="rotate(-18 176 72)"/>
+  <path d="M157 121C157 103.327 171.327 89 189 89H316L378 151V381C378 398.673 363.673 413 346 413H189C171.327 413 157 398.673 157 381V121Z" fill="#0E3EB0" fill-opacity="0.28"/>
+  <path d="M145 109C145 91.327 159.327 77 177 77H304L366 139V369C366 386.673 351.673 401 334 401H177C159.327 401 145 386.673 145 369V109Z" fill="url(#paper)"/>
+  <path d="M304 77V127C304 133.627 309.373 139 316 139H366" fill="#C9EFFF" fill-opacity="0.70"/>
+  <path d="M304 77L366 139H316C309.373 139 304 133.627 304 127V77Z" fill="#BFE9FF" fill-opacity="0.85"/>
+  <rect x="181" y="151" width="139" height="20" rx="10" fill="#2367D7"/>
+  <rect x="181" y="193" width="74" height="76" rx="13" fill="#4EA9EE"/>
+  <path d="M279 207H330" stroke="#2367D7" stroke-width="18" stroke-linecap="round"/>
+  <path d="M279 238H330" stroke="#2367D7" stroke-width="18" stroke-linecap="round"/>
+  <path d="M181 305H330" stroke="#2367D7" stroke-width="18" stroke-linecap="round"/>
+  <path d="M181 345H330" stroke="#2367D7" stroke-width="18" stroke-linecap="round"/>
+  <path d="M181 385H276" stroke="#2367D7" stroke-width="18" stroke-linecap="round"/>
 </svg>
