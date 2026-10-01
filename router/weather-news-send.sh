@@ -2,6 +2,8 @@
 set -eu
 
 mkdir -p /var/lib/weather-news
+today=$(date +%F)
+[ -f "/var/lib/weather-news/sent-$today" ] && exit 0
 
 /usr/bin/docker run --rm --network host --user 0:0 \
   --entrypoint python3 \
